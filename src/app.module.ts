@@ -17,6 +17,7 @@ import configurations from './config/configurations';
       useFactory: (configService: ConfigService) => ({
         dialect: configService.get('DATABASE.dialect'),
         host: configService.get('DATABASE.host'),
+        port: configService.get('DATABASE.port'),
         username: configService.get('DATABASE.username'),
         password: configService.get('DATABASE.password'),
         database: configService.get('DATABASE.database'),
