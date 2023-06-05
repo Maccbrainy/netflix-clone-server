@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AccessRolesModule } from './access-roles/access-roles.module';
 import { MoviesModule } from './movies/movies.module';
+import { ActorsModule } from './actors/actors.module';
+import { GenresModule } from './genres/genres.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { MoviesModule } from './movies/movies.module';
     UsersModule,
     AccessRolesModule,
     MoviesModule,
+    ActorsModule,
+    GenresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
