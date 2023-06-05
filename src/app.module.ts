@@ -4,8 +4,8 @@ import configurations from './config/configurations';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { UsersModule } from './users/users.module';
-import configurations from './config/configurations';
+import { UsersModule } from './users/users.module';
+import { AccessRolesModule } from './access-roles/access-roles.module';
 
 @Module({
   imports: [
@@ -27,7 +27,8 @@ import configurations from './config/configurations';
       }),
       inject: [ConfigService],
     }),
-    // UsersModule,
+    UsersModule,
+    AccessRolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
