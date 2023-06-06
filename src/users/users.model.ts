@@ -4,10 +4,12 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { AccessRoles } from 'src/access-roles/access-roles.model';
+import { Movies } from 'src/movies/movies.model';
 
 @Table
 export class Users extends Model {
@@ -47,6 +49,9 @@ export class Users extends Model {
     this.setDataValue('password', password);
   }
 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  accountActivated!: boolean;
+
   @ForeignKey(() => AccessRoles)
   @Column({
     defaultValue: 'User',
@@ -55,4 +60,7 @@ export class Users extends Model {
 
   @BelongsTo(() => AccessRoles)
   accessRoles!: AccessRoles;
+
+  @HasMany(() => Movies)
+  movies?: Movies[];
 }

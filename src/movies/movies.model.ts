@@ -4,11 +4,14 @@ import {
   Column,
   DataType,
   BelongsToMany,
+  BelongsTo,
+  ForeignKey,
 } from 'sequelize-typescript';
 import { Actors } from 'src/actors/actors.model';
 import { Genres } from 'src/genres/genres.model';
 import { MovieActors } from 'src/movie-actors/movie-actors.model';
 import { MovieGenres } from 'src/movie-genres/movie-genres.model';
+import { Users } from 'src/users/users.model';
 
 @Table
 export class Movies extends Model {
@@ -25,12 +28,6 @@ export class Movies extends Model {
   @Column({ allowNull: false })
   title!: string;
 
-  @BelongsToMany(() => Actors, () => MovieActors)
-  casts?: Actors[];
-
-  @BelongsToMany(() => Genres, () => MovieGenres)
-  genres?: Genres[];
-
   @Column({ allowNull: false })
   releaseDate!: Date;
 
@@ -45,4 +42,17 @@ export class Movies extends Model {
 
   @Column
   trailerUrl!: string;
+
+  @ForeignKey(() => Users)
+  @Column({ type: DataType.UUID })
+  documentedBy!: typeof DataType.UUID;
+
+  @BelongsTo(() => Users)
+  users!: Users;
+
+  @BelongsToMany(() => Actors, () => MovieActors)
+  casts?: Actors[];
+
+  @BelongsToMany(() => Genres, () => MovieGenres)
+  genres?: Genres[];
 }
