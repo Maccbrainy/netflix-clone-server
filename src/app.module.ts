@@ -9,6 +9,8 @@ import { AccessRolesModule } from './access-roles/access-roles.module';
 import { MoviesModule } from './movies/movies.module';
 import { ActorsModule } from './actors/actors.module';
 import { GenresModule } from './genres/genres.module';
+import { MovieActorsModule } from './movie-actors/movie-actors.module';
+import { MovieGenresModule } from './movie-genres/movies-genres.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { GenresModule } from './genres/genres.module';
     MoviesModule,
     ActorsModule,
     GenresModule,
+    MovieActorsModule,
+    MovieGenresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
