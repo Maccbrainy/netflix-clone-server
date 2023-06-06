@@ -1,4 +1,14 @@
-import { Table, Model, Column, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Model,
+  Column,
+  DataType,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { Actors } from 'src/actors/actors.model';
+import { Genres } from 'src/genres/genres.model';
+import { MovieActors } from 'src/movie-actors/movie-actors.model';
+import { MovieGenres } from 'src/movie-genres/movie-genres.model';
 
 @Table
 export class Movies extends Model {
@@ -14,6 +24,12 @@ export class Movies extends Model {
 
   @Column({ allowNull: false })
   title!: string;
+
+  @BelongsToMany(() => Actors, () => MovieActors)
+  casts?: Actors[];
+
+  @BelongsToMany(() => Genres, () => MovieGenres)
+  genres?: Genres[];
 
   @Column({ allowNull: false })
   releaseDate!: Date;
