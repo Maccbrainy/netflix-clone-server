@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { Exclude } from 'class-transformer';
 import {
   BelongsTo,
   Column,
@@ -43,6 +44,7 @@ export class Users extends Model {
   avatarUrl!: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
+  @Exclude({ toPlainOnly: true })
   set password(value: any) {
     const salt: string = bcrypt.genSaltSync();
     const password: string = bcrypt.hashSync(value, salt);
