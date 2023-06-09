@@ -34,7 +34,8 @@ export class Users extends Model {
   email!: string;
 
   @Column({
-    allowNull: false,
+    unique: true,
+    allowNull: true,
   })
   userName!: string;
 
