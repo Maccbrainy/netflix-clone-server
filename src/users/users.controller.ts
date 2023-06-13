@@ -8,6 +8,8 @@ import {
   Request,
 } from '@nestjs/common';
 import { SkipAuth } from 'src/auth/decorator/auth.decorator';
+import { RequiredAccessRoles } from 'src/access-roles/decorator/access-roles.decorator';
+import { Roles } from 'src/access-roles/access-roles.enum';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
@@ -43,16 +45,19 @@ export class UsersController {
   }
   //Find all users
   @Get()
+  @RequiredAccessRoles(Roles.SuperAdmin, Roles.Admin, Roles.AdminII)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':userId')
+  @RequiredAccessRoles(Roles.SuperAdmin, Roles.Admin, Roles.AdminII)
   findOne(@Param('userId') userId: string) {
     return this.usersService.findOne(userId);
   }
   //update a user
   @Patch(':userId')
+  @RequiredAccessRoles(Roles.SuperAdmin, Roles.Admin, Roles.AdminII)
   upgradeOrDegradeUserAccountType(
     @Body() updateUserDto: UpdateUserDto,
     @Param('userId') userId: string,
