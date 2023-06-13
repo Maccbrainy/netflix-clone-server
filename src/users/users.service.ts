@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from './users.model';
+import { AccessRoles } from 'src/access-roles/access-roles.model';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
