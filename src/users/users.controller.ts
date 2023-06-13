@@ -1,34 +1,32 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
   Patch,
   Post,
   Request,
-  UseInterceptors,
 } from '@nestjs/common';
+import { SkipAuth } from 'src/auth/decorator/auth.decorator';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('api/v1/users')
-@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   //User profile
   @Get('user')
   findProfile(@Request() request: any) {
-    return this.usersService.findProfile(request);
+    return this.usersService.findProfile(request.user);
   }
 
   //Update profile
   @Patch('user')
   updateProfile(@Body() updateUserDto: UpdateUserDto, @Request() request: any) {
-    return this.usersService.updateProfile(updateUserDto, request);
+    return this.usersService.updateProfile(updateUserDto, request.user);
   }
 
   //Find user by email
@@ -38,6 +36,7 @@ export class UsersController {
   }
 
   //Create user
+  @SkipAuth()
   @Post()
   createUserAndSubscription(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUserAndSubscription(createUserDto);
@@ -57,12 +56,12 @@ export class UsersController {
   upgradeOrDegradeUserAccountType(
     @Body() updateUserDto: UpdateUserDto,
     @Param('userId') userId: string,
-    @Request() request: Request,
+    @Request() request: any,
   ) {
     return this.usersService.upgradeOrDegradeUserAccountType(
       updateUserDto,
       userId,
-      request,
+      request.user,
     );
   }
 }

@@ -12,7 +12,7 @@ export class AccessRolesController {
   }
 
   @Get()
-  findAll(@Request() request: Request) {
-    return this.accessRolesService.findAll(request);
+  findAll(@Request() request: any) {
+    return this.accessRolesService.findAll(request.user);
   }
 }
