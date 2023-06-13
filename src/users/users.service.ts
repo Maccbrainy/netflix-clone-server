@@ -63,12 +63,12 @@ export class UsersService {
 
   //=======================Register/Login/Subscription logic Ends=====//
   async findAll(): Promise<{ users: Users[] }> {
-    const users = await this.UserModel.findAll();
+    const users = await this.UserModel.scope('excludePassword').findAll();
     return { users };
   }
 
   async findOne(userId: string): Promise<Users | null> {
-    const user = await this.UserModel.findByPk(userId);
+    const user = await this.UserModel.scope('excludePassword').findByPk(userId);
     return user;
   }
 
