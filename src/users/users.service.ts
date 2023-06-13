@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  PreconditionFailedException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from './users.model';
@@ -46,7 +46,7 @@ export class UsersService {
     const { email } = findUserByEmailDto;
     const user = await this.UserModel.findOne({ where: { email: email } });
 
-    if (user) throw new PreconditionFailedException('User already exist');
+    if (user) throw new ConflictException('User already exist');
 
     throw new NotFoundException('User does not exist');
   }
@@ -55,7 +55,7 @@ export class UsersService {
     const { email } = createUserDto;
     const user = await this.UserModel.findOne({ where: { email: email } });
 
-    if (user) throw new PreconditionFailedException('User already exist');
+    if (user) throw new ConflictException('User already exist');
 
     await this.UserModel.create({ ...createUserDto });
     return { message: 'Account created successfully' };

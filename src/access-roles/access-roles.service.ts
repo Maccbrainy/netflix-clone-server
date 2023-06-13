@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AccessRoles } from './access-roles.model';
 import { CreateAccessRolesDto } from './dto/create-access-roles.dto';
@@ -18,8 +18,7 @@ export class AccessRolesService {
       where: { [Op.or]: [{ level: level }, { roleType: roleType }] },
     });
 
-    if (accessRole)
-      throw new BadRequestException('Conflicting Security details');
+    if (accessRole) throw new ConflictException('Conflicting Security details');
 
     await this.AccessRolesModel.create({ ...createAccessRolesDto });
 
