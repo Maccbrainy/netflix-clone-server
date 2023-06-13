@@ -10,16 +10,18 @@ import { Users } from './users.model';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessRoles } from 'src/access-roles/access-roles.model';
+import { RequestUser } from './type/request-user.interface';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(Users) private UserModel: typeof Users) {}
 
-  async findProfile(request: any): Promise<any> {
+  async findProfile(requestUser: RequestUser): Promise<any> {
     try {
-      const { userId } = request.user;
-      const user = await this.UserModel.findByPk(userId);
+      const { userId } = requestUser;
+      const user = await this.UserModel.scope('excludePassword').findByPk(
+        userId,
+      );
       return user;
     } catch (error) {
       throw new InternalServerErrorException();
@@ -28,10 +30,10 @@ export class UsersService {
 
   async updateProfile(
     updateUserDto: UpdateUserDto,
-    request: any,
+    requestUser: RequestUser,
   ): Promise<any> {
     try {
-      const { userId } = request.user;
+      const { userId } = requestUser;
       await this.UserModel.update(updateUserDto, { where: { userId: userId } });
       return { message: 'Profile updated successfully' };
     } catch (error) {
@@ -73,14 +75,14 @@ export class UsersService {
   async upgradeOrDegradeUserAccountType(
     updateUserDto: UpdateUserDto,
     userId: string,
-    request: any,
+    requestUser: RequestUser,
   ): Promise<any> {
     try {
       //Find the user whose account is to be upgraded/degraded
       const user: Users | null = await this.UserModel.findByPk(userId, {
         include: AccessRoles,
       });
-      if (request.user.accessRoleLevel > (user as Users).accessRoles.level) {
+      if (requestUser.accessRoleLevel > (user as Users).accessRoles.level) {
         throw new ForbiddenException('Consult your higher authority');
       } else {
         await this.UserModel.update(updateUserDto, {

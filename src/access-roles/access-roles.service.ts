@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AccessRoles } from './access-roles.model';
 import { CreateAccessRolesDto } from './dto/create-access-roles.dto';
-import { Op } from 'sequelize';
+import { RequestUser } from 'src/users/type/request-user.interface';
 
 @Injectable()
 export class AccessRolesService {
@@ -26,12 +26,14 @@ export class AccessRolesService {
     return { message: 'Security Protocol Successfully Created' };
   }
 
-  async findAll(request: any): Promise<{ accessRoles: AccessRoles[] }> {
+  async findAll(
+    requestUser: RequestUser,
+  ): Promise<{ accessRoles: AccessRoles[] }> {
     const accessRoles = await this.AccessRolesModel.findAll({
       where: {
         level: {
-          //Get Access role details whose 'levels' is >= to the user request level
-          [Op.gte]: request.user.accessRoleLevel,
+          //Get AccessRoles whose 'level' is >= to the user request level
+          [Op.gte]: requestUser.accessRoleLevel,
         },
       },
       //Get Only details of these attributes
