@@ -8,6 +8,7 @@ import {
   Model,
   Table,
   Scopes,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { AccessRoles } from 'src/access-roles/access-roles.model';
 import { Movies } from 'src/movies/movies.model';
@@ -68,6 +69,9 @@ export class Users extends Model {
 
   @BelongsTo(() => AccessRoles)
   accessRoles!: AccessRoles;
+
+  @BelongsToMany(() => Subscriptions, () => UserSubscriptionPlans)
+  subscriptionPlans!: Subscriptions[];
 
   @HasMany(() => Movies)
   movies?: Movies[];
