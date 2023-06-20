@@ -4,18 +4,27 @@ import {
   InternalServerErrorException,
   NotFoundException,
   ConflictException,
+  Inject,
+  PreconditionFailedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from './users.model';
+import { AuthService } from 'src/auth/auth.service';
 import { AccessRoles } from 'src/access-roles/access-roles.model';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindUserByEmailDto } from './dto/find-user-by-email.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { RequestUser } from './type/request-user.interface';
+import { RequestUser } from './interfaces/request-user.interface';
+import { LoginCredentialsDto } from 'src/auth/dto/login-credentials.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(Users) private UserModel: typeof Users) {}
+  constructor(
+    @InjectModel(Users) private UserModel: typeof Users,
+    private jwtService: JwtService,
+    @Inject(AuthService) private authService: AuthService,
+  ) {}
 
   async findProfile(requestUser: RequestUser): Promise<any> {
     try {
@@ -45,21 +54,44 @@ export class UsersService {
   //=======================Register/Login/Subscription logic Begins=====//
   async findUserByEmail(findUserByEmailDto: FindUserByEmailDto): Promise<any> {
     const { email } = findUserByEmailDto;
-    const user = await this.UserModel.findOne({ where: { email: email } });
+    const user: Users | null = await this.UserModel.findOne({
+      where: { email: email },
+    });
 
-    if (user) throw new ConflictException('User already exist');
+    if (user && user.accountActivated)
+      return { message: 'This is an activated account' };
+    if (user && !user.accountActivated)
+      throw new PreconditionFailedException(
+        'User account is not activated yet',
+      );
 
     throw new NotFoundException('User does not exist');
   }
 
-  async createUserAndSubscription(createUserDto: CreateUserDto): Promise<any> {
+  async createUserAndAsignTokenIfUserDoesNotExistOrLoginUserIfExist(
+    createUserDto: CreateUserDto,
+  ): Promise<any> {
     const { email } = createUserDto;
     const user = await this.UserModel.findOne({ where: { email: email } });
 
-    if (user) throw new ConflictException('User already exist');
+    //Return an error if user is valid but account is activated; security check;
+    if (user && user.accountActivated)
+      throw new ConflictException('This is an activated account');
+    //Login user if user exist and user account is not activated
+    if (user && !user.accountActivated) {
+      const loginCredentialsDto: LoginCredentialsDto = createUserDto;
+      return this.authService.verifyAndTokenizeLoginUser(loginCredentialsDto);
+    }
 
-    await this.UserModel.create({ ...createUserDto });
-    return { message: 'Account created successfully' };
+    const newlyRegisteredUser: Users = await this.UserModel.create({
+      ...createUserDto,
+    });
+    const payload = {
+      sub: newlyRegisteredUser.userId,
+      roleType: newlyRegisteredUser.roleType,
+    };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return { accessToken };
   }
 
   //=======================Register/Login/Subscription logic Ends=====//
