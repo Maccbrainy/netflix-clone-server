@@ -13,6 +13,8 @@ import { ActorsModule } from './actors/actors.module';
 import { GenresModule } from './genres/genres.module';
 import { MovieActorsModule } from './movie-actors/movie-actors.module';
 import { MovieGenresModule } from './movie-genres/movies-genres.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { UserSubscriptionPlansModule } from './user-subscription-plans/user-subscription-plans.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { MovieGenresModule } from './movie-genres/movies-genres.module';
     GenresModule,
     MovieActorsModule,
     MovieGenresModule,
+    SubscriptionsModule,
+    UserSubscriptionPlansModule,
   ],
   controllers: [AppController],
   providers: [
