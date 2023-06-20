@@ -12,6 +12,8 @@ import {
 } from 'sequelize-typescript';
 import { AccessRoles } from 'src/access-roles/access-roles.model';
 import { Movies } from 'src/movies/movies.model';
+import { Subscriptions } from 'src/subscriptions/subscriptions.model';
+import { UserSubscriptionPlans } from 'src/user-subscription-plans/user-subscription-plans.model';
 @Scopes(() => ({
   excludePassword: {
     attributes: {
@@ -58,14 +60,14 @@ export class Users extends Model {
     this.setDataValue('password', password);
   }
 
-  @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  accountActivated!: boolean;
-
   @ForeignKey(() => AccessRoles)
   @Column({
     defaultValue: 'User',
   })
   roleType!: string;
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  accountActivated!: boolean;
 
   @BelongsTo(() => AccessRoles)
   accessRoles!: AccessRoles;
