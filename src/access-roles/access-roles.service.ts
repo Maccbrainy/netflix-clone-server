@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { AccessRoles } from './access-roles.model';
 import { CreateAccessRolesDto } from './dto/create-access-roles.dto';
-import { RequestUser } from 'src/users/type/request-user.interface';
+import { RequestUser } from 'src/users/interfaces/request-user.interface';
 
 @Injectable()
 export class AccessRolesService {
