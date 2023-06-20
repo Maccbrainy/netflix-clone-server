@@ -30,5 +30,6 @@ import { SequelizeModule } from '@nestjs/sequelize';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports: [JwtModule, SequelizeModule, AuthService],
 })
 export class AuthModule {}
