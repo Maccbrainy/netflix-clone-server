@@ -30,7 +30,7 @@ export class AuthService {
         const accessToken = await this.jwtService.signAsync(payload);
         return { accessToken };
       }
-      throw new UnauthorizedException('Invalid Email or Password');
+      throw new UnauthorizedException('Incorrect Password');
     }
     throw new UnauthorizedException('Invalid Email or Password');
   }

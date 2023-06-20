@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from 'src/users/users.model';
 import { AccessRoles } from 'src/access-roles/access-roles.model';
-import { JwtPayload } from './type/jwt-payload.interface';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
