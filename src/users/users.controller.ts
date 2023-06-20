@@ -40,8 +40,12 @@ export class UsersController {
   //Create user
   @SkipAuth()
   @Post()
-  createUserAndSubscription(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUserAndSubscription(createUserDto);
+  createUserAndAsignTokenIfUserDoesNotExistOrLoginUserIfExist(
+    @Body() createUserDto: CreateUserDto,
+  ) {
+    return this.usersService.createUserAndAsignTokenIfUserDoesNotExistOrLoginUserIfExist(
+      createUserDto,
+    );
   }
   //Find all users
   @Get()
