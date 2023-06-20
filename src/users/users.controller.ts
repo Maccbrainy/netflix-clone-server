@@ -32,6 +32,7 @@ export class UsersController {
   }
 
   //Find user by email
+  @SkipAuth()
   @Post('user')
   findUserByEmail(@Body() findUserByEmailDto: FindUserByEmailDto) {
     return this.usersService.findUserByEmail(findUserByEmailDto);
