@@ -14,7 +14,7 @@ export class AuthService {
 
   async verifyAndTokenizeLoginUser(
     loginCredentialsDto: LoginCredentialsDto,
-  ): Promise<any> {
+  ): Promise<{ accessToken: string }> {
     const { email, password } = loginCredentialsDto;
 
     if (email && password) {
@@ -30,8 +30,8 @@ export class AuthService {
         const accessToken = await this.jwtService.signAsync(payload);
         return { accessToken };
       }
-      throw new UnauthorizedException('Incorrect Password');
+      throw new UnauthorizedException('Incorrect password');
     }
-    throw new UnauthorizedException('Invalid Email or Password');
+    throw new UnauthorizedException('Invalid email or password');
   }
 }

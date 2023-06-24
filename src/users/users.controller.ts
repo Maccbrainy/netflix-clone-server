@@ -41,10 +41,10 @@ export class UsersController {
   //Create user
   @SkipAuth()
   @Post()
-  createUserAndAsignTokenIfUserDoesNotExistOrLoginUserIfExist(
+  createNewUserAndAsignTokenOrLogInExistingUser(
     @Body() createUserDto: CreateUserDto,
   ) {
-    return this.usersService.createUserAndAsignTokenIfUserDoesNotExistOrLoginUserIfExist(
+    return this.usersService.createNewUserAndAsignTokenOrLogInExistingUser(
       createUserDto,
     );
   }

@@ -42,7 +42,7 @@ export class UserSubscriptionPlansService {
       await this.UserModel.update(updateUserDto, {
         where: { userId: userId },
       });
-      return { message: 'Account activated successfully' };
+      return { message: 'Account activated successfully', statusCode: 201 };
     }
   }
 }

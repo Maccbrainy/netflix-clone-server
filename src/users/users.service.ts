@@ -1,12 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  ConflictException,
-  Inject,
-  PreconditionFailedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from './users.model';
@@ -26,57 +18,56 @@ export class UsersService {
     @Inject(AuthService) private authService: AuthService,
   ) {}
 
-  async findProfile(requestUser: RequestUser): Promise<any> {
-    try {
-      const { userId } = requestUser;
-      const user = await this.UserModel.scope('excludePassword').findByPk(
-        userId,
-      );
-      return user;
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
+  async findProfile(requestUser: RequestUser): Promise<Users | null> {
+    const { userId } = requestUser;
+    const user = await this.UserModel.scope('excludePassword').findByPk(userId);
+    return user;
   }
 
   async updateProfile(
     updateUserDto: UpdateUserDto,
     requestUser: RequestUser,
-  ): Promise<any> {
-    try {
-      const { userId } = requestUser;
-      await this.UserModel.update(updateUserDto, { where: { userId: userId } });
-      return { message: 'Profile updated successfully' };
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
+  ): Promise<{
+    message: string;
+    statusCode: number;
+    error?: null;
+  }> {
+    const { userId } = requestUser;
+    await this.UserModel.update(updateUserDto, { where: { userId: userId } });
+    return { message: 'Profile updated successfully', statusCode: 201 };
   }
 
-  //=======================Register/Login/Subscription logic Begins=====//
-  async findUserByEmail(findUserByEmailDto: FindUserByEmailDto): Promise<any> {
+  //=======================Register/Subscription logic Begins=====//
+  async findUserByEmail(findUserByEmailDto: FindUserByEmailDto): Promise<{
+    message: string;
+    statusCode: number;
+    error?: null;
+  }> {
     const { email } = findUserByEmailDto;
     const user: Users | null = await this.UserModel.findOne({
       where: { email: email },
     });
 
     if (user && user.accountActivated)
-      return { message: 'This is an activated account' };
+      return {
+        message: 'This is an activated account',
+        statusCode: 201,
+        error: null,
+      };
     if (user && !user.accountActivated)
-      throw new PreconditionFailedException(
-        'User account is not activated yet',
-      );
+      return { message: 'User account is not activated yet', statusCode: 412 };
 
-    throw new NotFoundException('User does not exist');
+    return { message: 'User does not exist', statusCode: 404 };
   }
 
-  async createUserAndAsignTokenIfUserDoesNotExistOrLoginUserIfExist(
+  async createNewUserAndAsignTokenOrLogInExistingUser(
     createUserDto: CreateUserDto,
-  ): Promise<any> {
+  ): Promise<{ accessToken: string }> {
     const { email } = createUserDto;
     const user = await this.UserModel.findOne({ where: { email: email } });
 
-    //Return an error if user is valid but account is activated; security check;
     if (user && user.accountActivated)
-      throw new ConflictException('This is an activated account');
+      throw new ForbiddenException('This is an activated account');
     //Login user if user exist and user account is not activated
     if (user && !user.accountActivated) {
       const loginCredentialsDto: LoginCredentialsDto = createUserDto;
@@ -93,8 +84,7 @@ export class UsersService {
     const accessToken = await this.jwtService.signAsync(payload);
     return { accessToken };
   }
-
-  //=======================Register/Login/Subscription logic Ends=====//
+  //=======================Register/Subscription logic Ends=====//
   async findAll(): Promise<{ users: Users[] }> {
     const users = await this.UserModel.scope('excludePassword').findAll();
     return { users };
@@ -109,22 +99,22 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
     userId: string,
     requestUser: RequestUser,
-  ): Promise<any> {
-    try {
-      //Find the user whose account is to be upgraded/degraded
-      const user: Users | null = await this.UserModel.findByPk(userId, {
-        include: AccessRoles,
+  ): Promise<{
+    message: string;
+    statusCode: number;
+    error?: null;
+  }> {
+    //Find the user whose account is to be upgraded/degraded
+    const user: Users | null = await this.UserModel.findByPk(userId, {
+      include: AccessRoles,
+    });
+    if (requestUser.accessRoleLevel > (user as Users).accessRoles.level) {
+      throw new ForbiddenException('Consult your higher authority');
+    } else {
+      await this.UserModel.update(updateUserDto, {
+        where: { userId: userId },
       });
-      if (requestUser.accessRoleLevel > (user as Users).accessRoles.level) {
-        throw new ForbiddenException('Consult your higher authority');
-      } else {
-        await this.UserModel.update(updateUserDto, {
-          where: { userId: userId },
-        });
-        return { message: 'Account updated successfully' };
-      }
-    } catch (error) {
-      throw new InternalServerErrorException();
+      return { message: 'Account updated successfully', statusCode: 201 };
     }
   }
 }
